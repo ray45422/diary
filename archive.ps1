@@ -1,5 +1,5 @@
-$wiki = '..\diary.wiki'
-$repo = '.\'
+$wiki = '../diary.wiki'
+$repo = './'
 
 class Log {
     [string]$Commit = $null
@@ -47,7 +47,7 @@ Get-ChildItem $wiki -File -Filter '*-*-*.md' | ForEach-Object {
         'Logs' = [Log[]](Get-Log $logs)
     }
 } | ForEach-Object {
-    $cont = Get-Content "$wiki\$($_.Name)"
+    $cont = Get-Content "$wiki/$($_.Name)"
     $cont += ''
     $cont += '変更履歴:  '
     $_.Logs | Sort-Object -Property Date | ForEach-Object {
@@ -55,12 +55,12 @@ Get-ChildItem $wiki -File -Filter '*-*-*.md' | ForEach-Object {
     }
 
     $n = $name -split '-'
-    $dir = "$($n[0])\$($n[1])"
+    $dir = "$($n[0])/$($n[1])"
     if(!(Test-Path $dir)) {
-        $null = New-Item -ItemType Directory "$repo\$dir" -Force
+        $null = New-Item -ItemType Directory "$repo/$dir" -Force
     }
-    $cont | Set-Content "$repo\$dir\$($n[2])"
-    Remove-Item "$wiki\$($_.Name)"
+    $cont | Set-Content "$repo/$dir/$($n[2])"
+    Remove-Item "$wiki/$($_.Name)"
 }
 
 $t = @(
@@ -77,7 +77,7 @@ Get-ChildItem -Directory $repo | Where-Object {$_.Name -match '^\d{4}$'} | ForEa
         "# ${year}年"
         ''
     )
-    Get-ChildItem -Directory $repo\$year | ForEach-Object {
+    Get-ChildItem -Directory $repo/$year | ForEach-Object {
         $month = $_.Name
         [int]$n = $month
         $y += "[${n}月](./$month/README.md)  "
@@ -97,7 +97,7 @@ Get-ChildItem -Directory $repo | Where-Object {$_.Name -match '^\d{4}$'} | ForEa
         while($true) {
             $dd = '{0:D2}' -f $d.Day
 
-            if(Test-Path "$repo\$year\$month\$dd.md") {
+            if(Test-Path "$repo/$year/$month/$dd.md") {
                 $w += "[$($d.Day)](./$dd.md)"
             } else {
                 $w += $d.Day
@@ -120,12 +120,12 @@ Get-ChildItem -Directory $repo | Where-Object {$_.Name -match '^\d{4}$'} | ForEa
 
         $m += ''
         $m += "[${year}年](../README.md)"
-        $m | Set-Content "$repo\$year\$month\README.md"
+        $m | Set-Content "$repo/$year/$month/README.md"
     }
     $y += ''
     $y += '[Top](../README.md)'
-    $y | Set-Content "$repo\$year\README.md"
+    $y | Set-Content "$repo/$year/README.md"
 }
 
 $t = $t -join "`r`n"
-$t.Trim() | Set-Content "$repo\README.md"
+$t.Trim() | Set-Content "$repo/README.md"
