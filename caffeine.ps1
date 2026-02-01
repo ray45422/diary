@@ -6,8 +6,10 @@
     [datetime]$Date
 }
 
-#$year = Read-Host -Prompt 'Year'
-$year = 2024
+$year = Read-Host -Prompt 'Year'
+if (!(Test-Path -LiteralPath $year)) {
+    throw 'ファイルがない'
+}
 $files = Get-ChildItem -LiteralPath $year -Recurse -File
 $list = [System.Collections.ArrayList]::new()
 $files | Where-Object {$_.BaseName -match '^[0-9]{2}$'} | ForEach-Object {
@@ -73,4 +75,4 @@ $files | Where-Object {$_.BaseName -match '^[0-9]{2}$'} | ForEach-Object {
     }
 }
 
-$list | ConvertTo-Csv | Set-Content -LiteralPath "caffeine${year}.csv"
+$list | ConvertTo-Csv | Set-Content -LiteralPath "${year}/caffeine.csv"
